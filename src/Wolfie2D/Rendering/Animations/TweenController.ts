@@ -1,7 +1,7 @@
 import Map from "../../DataTypes/Map";
-import GameNode from "../../Nodes/GameNode";
+import GameNode, { TweenableProperties } from "../../Nodes/GameNode";
 import { AnimationState, TweenData } from "./AnimationTypes";
-import EaseFunctions from "../../Utils/EaseFunctions";
+import EaseFunctions, { EaseFunctionType } from "../../Utils/EaseFunctions";
 import MathUtils from "../../Utils/MathUtils";
 import TweenManager from "./TweenManager";
 import Emitter from "../../Events/Emitter";

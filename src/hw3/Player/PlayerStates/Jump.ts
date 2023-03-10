@@ -1,8 +1,11 @@
 import GameEvent from "../../../Wolfie2D/Events/GameEvent";
 import { GameEventType } from "../../../Wolfie2D/Events/GameEventType";
 import { PlayerStates, PlayerTweens } from "../PlayerController";
+import TweenController from "../../../Wolfie2D/Rendering/Animations/TweenController";
 
 import PlayerState from "./PlayerState";
+import { TweenableProperties } from "../../../Wolfie2D/Nodes/GameNode";
+import { EaseFunctionType } from "../../../Wolfie2D/Utils/EaseFunctions";
 
 export default class Jump extends PlayerState {
 
@@ -13,6 +16,8 @@ export default class Jump extends PlayerState {
         this.parent.velocity.y = -200;
         // Play the jump sound for the player
 		this.emitter.fireEvent(GameEventType.PLAY_SOUND, {key: jumpAudio, loop: false, holdReference: false});
+        let jumpTween = this.owner.tweens.add("myTween", myTween);
+        this.owner.tweens.play("myTween");
 	}
 
 	public update(deltaT: number): void {
@@ -44,4 +49,17 @@ export default class Jump extends PlayerState {
 		this.owner.animation.stop();
 		return {};
 	}
-}
+}const myTween = {
+    effects: [
+        {
+            property: TweenableProperties.rotation,
+            start: 0,
+            end: 360,
+            ease: EaseFunctionType.IN_OUT_QUAD
+        }
+    ],
+    duration: 1000,
+    reverseOnComplete: false,
+    loop: false,
+    onEnd: ""
+};

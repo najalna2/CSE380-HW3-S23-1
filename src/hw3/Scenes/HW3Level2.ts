@@ -6,6 +6,8 @@ import MainMenu from "./MainMenu";
 import Viewport from "../../Wolfie2D/SceneGraph/Viewport";
 import RenderingManager from "../../Wolfie2D/Rendering/RenderingManager";
 import SceneManager from "../../Wolfie2D/Scene/SceneManager";
+import { GameEventType } from "../../Wolfie2D/Events/GameEventType";
+import ResourceManager from "../../Wolfie2D/ResourceManager/ResourceManager";
 
 /**
  * The second level for HW4. It should be the goose dungeon / cave.
@@ -22,6 +24,7 @@ export default class Level2 extends HW3Level {
     public static readonly DESTRUCTIBLE_LAYER_KEY = "Destructable";
     public static readonly WALLS_LAYER_KEY = "Main";
 
+    public static readonly STOP_SOUND = "STOP_SOUND";
     public static readonly LEVEL_MUSIC_KEY = "LEVEL_MUSIC";
     public static readonly LEVEL_MUSIC_PATH = "hw4_assets/music/hw5_level_music.wav";
 
@@ -69,10 +72,21 @@ export default class Level2 extends HW3Level {
         this.load.audio(this.levelMusicKey, Level2.LEVEL_MUSIC_PATH);
         this.load.audio(this.jumpAudioKey, Level2.JUMP_AUDIO_PATH);
         this.load.audio(this.tileDestroyedAudioKey, Level2.TILE_DESTROYED_PATH);
+
+        ResourceManager.keepSpritesheet(this.playerSpriteKey);
     }
 
     public unloadScene(): void {
         // TODO decide which resources to keep/cull 
+        // Remove the player object from the scene
+        this.player.destroy();
+        this.player = null;
+
+        // Remove the level end object from the scene
+        this.levelEndArea.destroy();
+        this.levelEndArea = null;
+
+        this.emitter.fireEvent(GameEventType.STOP_SOUND);
     }
 
     public startScene(): void {

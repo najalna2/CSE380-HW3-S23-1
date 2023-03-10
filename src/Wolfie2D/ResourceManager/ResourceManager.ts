@@ -209,8 +209,14 @@ export default class ResourceManager {
      * Tells the resource manager to keep this resource
      * @param key The key of the resource
      */
-    public keepSpritesheet(key: string): void {
-        this.keepResource(key, ResourceType.SPRITESHEET);
+    private static _persistentSpritesheets: Set<string> = new Set<string>();
+
+    public static keepSpritesheet(key: string): void {
+        this._persistentSpritesheets.add(key);
+    }
+
+    public static isSpritesheetPersistent(key: string): boolean {
+        return this._persistentSpritesheets.has(key);
     }
 
     /**

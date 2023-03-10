@@ -95,6 +95,14 @@ export default abstract class HW3Level extends Scene {
     public constructor(viewport: Viewport, sceneManager: SceneManager, renderingManager: RenderingManager, options: Record<string, any>) {
         super(viewport, sceneManager, renderingManager, {...options, physics: {
             // TODO configure the collision groups and collision map
+            collisionGroups: {
+                [HW3PhysicsGroups.PLAYER]: [HW3PhysicsGroups.GROUND, HW3PhysicsGroups.DESTRUCTABLE],
+                [HW3PhysicsGroups.PLAYER_WEAPON]: [HW3PhysicsGroups.GROUND, HW3PhysicsGroups.DESTRUCTABLE],
+                [HW3PhysicsGroups.GROUND]: [HW3PhysicsGroups.PLAYER, HW3PhysicsGroups.PLAYER_WEAPON],
+                [HW3PhysicsGroups.DESTRUCTABLE]: [HW3PhysicsGroups.PLAYER, HW3PhysicsGroups.PLAYER_WEAPON]
+            },
+            collisionStart: [
+            ]
          }});
         this.add = new HW3FactoryManager(this, this.tilemaps);
     }
@@ -210,6 +218,7 @@ export default abstract class HW3Level extends Scene {
                     if(tilemap.isTileCollidable(col, row) && this.particleHitTile(tilemap, particle, col, row)){
                         this.emitter.fireEvent(GameEventType.PLAY_SOUND, { key: this.tileDestroyedAudioKey, loop: false, holdReference: false });
                         // TODO Destroy the tile
+                        tilemap.destroy();
                     }
                 }
             }
@@ -227,6 +236,9 @@ export default abstract class HW3Level extends Scene {
      */
     protected particleHitTile(tilemap: OrthogonalTilemap, particle: Particle, col: number, row: number): boolean {
         // TODO detect whether a particle hit a tile
+        
+        
+    return false;
         return;
     }
 
@@ -410,7 +422,24 @@ export default abstract class HW3Level extends Scene {
         this.player.addPhysics(new AABB(this.player.position.clone(), this.player.boundary.getHalfSize().clone()));
 
         // TODO - give the player their flip tween
-
+        this.player.tweens.add("flip", {
+            startDelay: 0,
+            duration: 500,
+            effects: [
+            {
+            property: "scale",
+            start: new Vec2(1, 1),
+            end: new Vec2(-1, 1)
+            }
+            ],
+            onEnd: () => {
+            this.player.setGroup(HW3PhysicsGroups.PLAYER);
+            // Emit an event to indicate the player flip animation has ended
+            }
+            });
+            // Play the tween
+            this.player.tweens.play("flip");
+            
         // Give the player a death animation
         this.player.tweens.add(PlayerTweens.DEATH, {
             startDelay: 0,

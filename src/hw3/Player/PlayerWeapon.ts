@@ -3,6 +3,9 @@ import ParticleSystem from "../../Wolfie2D/Rendering/Animations/ParticleSystem";
 import Color from "../../Wolfie2D/Utils/Color";
 import { EaseFunctionType } from "../../Wolfie2D/Utils/EaseFunctions";
 import RandUtils from "../../Wolfie2D/Utils/RandUtils";
+import Vec2 from "../../Wolfie2D/DataTypes/Vec2";
+import { HW3PhysicsGroups } from "../HW3PhysicsGroups";
+import { HW3Events } from "../HW3Events";
 
  
 
@@ -13,6 +16,10 @@ import RandUtils from "../../Wolfie2D/Utils/RandUtils";
  * be spawned at the player's position and fired in the direction of the mouse's position.
  */
 export default class PlayerWeapon extends ParticleSystem {
+
+    constructor(poolSize: number, sourcePoint: Vec2, lifetime: number, size: number, mass: number, maxParticlesPerFrame: number) {
+        super(poolSize, sourcePoint, lifetime, size, mass, maxParticlesPerFrame);
+    }
 
     public getPool(): Readonly<Array<Particle>> {
         return this.particlePool;
@@ -28,23 +35,30 @@ export default class PlayerWeapon extends ParticleSystem {
      * @param particle the particle to give the animation to
      */
     public setParticleAnimation(particle: Particle) {
-        // Give the particle a random velocity.
-        particle.vel = RandUtils.randVec(100, 200, -32, 32);
+        // Give the particle a velocity towards the mouse position
+        let mousePos = this.scene.getMousePosition();
+        let dir = mousePos.difference(this.sourcePoint);
+        dir.normalize();
+        let speed = RandUtils.randFloat(300, 400);
+        particle.vel = dir.scaled(speed);
+
+        // Set particle properties
         particle.color = Color.RED;
+        particle.alpha = 1;
 
-        // Give the particle tweens
-        particle.tweens.add("active", {
-            startDelay: 0,
-            duration: this.lifetime,
-            effects: [
-                {
-                    property: "alpha",
-                    start: 1,
-                    end: 0,
-                    ease: EaseFunctionType.IN_OUT_SINE
-                }
-            ]
-        });
+        // Set up animation frames and timing
+        const frames = 10;
+        const frameDuration = this.lifetime / frames;
+        let currentFrame = 0;
+
+        // Set up animation callback
+        const animate = () => {
+            currentFrame += 1;
+            if (currentFrame <= frames) {
+                particle.alpha = 1 - currentFrame / frames;
+            } else {
+                particle.alpha = 0;
+            }
+        }
     }
-
 }

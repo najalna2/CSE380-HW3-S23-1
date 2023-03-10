@@ -5,6 +5,8 @@ import RenderingManager from "../../Wolfie2D/Rendering/RenderingManager";
 import SceneManager from "../../Wolfie2D/Scene/SceneManager";
 import Viewport from "../../Wolfie2D/SceneGraph/Viewport";
 import HW4Level2 from "./HW3Level2";
+import { GameEventType } from "../../Wolfie2D/Events/GameEventType";
+import ResourceManager from "../../Wolfie2D/ResourceManager/ResourceManager";
 
 /**
  * The first level for HW4 - should be the one with the grass and the clouds.
@@ -31,6 +33,7 @@ export default class Level1 extends HW3Level {
     public static readonly TILE_DESTROYED_PATH = "hw4_assets/sounds/switch.wav";
 
     public static readonly LEVEL_END = new AABB(new Vec2(224, 232), new Vec2(24, 16));
+    game: any;
 
     public constructor(viewport: Viewport, sceneManager: SceneManager, renderingManager: RenderingManager, options: Record<string, any>) {
         super(viewport, sceneManager, renderingManager, options);
@@ -68,13 +71,35 @@ export default class Level1 extends HW3Level {
         this.load.audio(this.levelMusicKey, Level1.LEVEL_MUSIC_PATH);
         this.load.audio(this.jumpAudioKey, Level1.JUMP_AUDIO_PATH);
         this.load.audio(this.tileDestroyedAudioKey, Level1.TILE_DESTROYED_PATH);
+
+        // Load the player spritesheet, only if it has not been loaded before
+         if (!this.game.getResourceManager().isResourceLoaded("player_spritesheet")) {
+            this.load.spritesheet("player_spritesheet", "hw3_assets/player_spritesheet.png");
+        }
+        // Load the player jump sound, only if it has not been loaded before
+        if (!this.game.getResourceManager().isResourceLoaded("jump_sound")) {
+            this.load.audio("jump_sound", "hw3_assets/jump_sound.wav");
+        }
+        // Load the player hurt sound, only if it has not been loaded before
+        if (!this.game.getResourceManager().isResourceLoaded("hurt_sound")) {
+            this.load.audio("hurt_sound", "hw3_assets/hurt_sound.wav");
+        }
+
     }
 
     /**
      * Unload resources for level 1
      */
     public unloadScene(): void {
-        // TODO decide which resources to keep/cull 
+        // Remove the player object from the scene
+        this.player.destroy();
+        this.player = null;
+
+        // Remove the level end object from the scene
+        this.levelEndArea.destroy();
+        this.levelEndArea = null;
+
+        this.emitter.fireEvent(GameEventType.STOP_SOUND);
     }
 
     public startScene(): void {
