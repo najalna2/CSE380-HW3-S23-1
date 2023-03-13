@@ -16,6 +16,7 @@ import { HW3Events } from "../HW3Events";
  * be spawned at the player's position and fired in the direction of the mouse's position.
  */
 export default class PlayerWeapon extends ParticleSystem {
+    scene: any;
 
     constructor(poolSize: number, sourcePoint: Vec2, lifetime: number, size: number, mass: number, maxParticlesPerFrame: number) {
         super(poolSize, sourcePoint, lifetime, size, mass, maxParticlesPerFrame);
@@ -58,6 +59,8 @@ export default class PlayerWeapon extends ParticleSystem {
                 particle.alpha = 1 - currentFrame / frames;
             } else {
                 particle.alpha = 0;
+                particle.vel = new Vec2(0, 0);
+                particle.aiActive = false;
             }
         }
     }
